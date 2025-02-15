@@ -1,0 +1,33 @@
+*feat1D
+*heading
+Problem T4L2-1 (units: lb in)
+*alpha
+** alpha #, value
+1, 6e7
+*beta
+** beta #, value
+1, 0.0
+*force
+** force #, value
+1, 1
+2, 9
+*nodal coordinate
+** node #, x coordinate
+1,   0.0
+2,   1.0
+3,   2.0
+4,   3.0
+5,   4.0
+*nodal flux
+** node #, flux value
+*element data
+** element #, alpha gr#, beta gr#, force gr#, element type, list of element nodes
+1, 1, 1, 1, 1DC0Q, 1, 2, 3
+2, 1, 1, 2, 1DC0Q, 3, 4, 5
+*left end BC
+** bc type, value 1, value 2
+EBC, 0.0, 0.0
+*right end BC
+** bc type, value 1, value 2
+NBC, 0.0, 0.0
+*end
