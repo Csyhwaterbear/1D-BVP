@@ -1,0 +1,59 @@
+#ifndef PROCESS_H
+#define PROCESS_H
+#include <string>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+class Process
+{
+	public:
+		void Input(const std::string& file_path);
+		void ParseFile(); // Reads the file once and stores data
+		void PrintData(); // Prints all stored values
+		void Print_Matrix(vector<vector<double>> A);
+		void Print_Vector(vector<double> A);
+		bool Symmetric_Cond(vector<vector<double>> A);
+		vector<double> Solve(vector<vector<double>> & A, vector<double> & B);
+		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);
+		tuple<vector<vector<double>>, vector<double>> Build();
+	private:
+		
+		struct Element_Value
+		{
+			// alpha, beta, force, nodal_coordinate, nodel_flux
+			int index;
+			double value;
+		};
+		
+		struct Element_Data
+		{
+			int e, a, b, f;
+			vector<int> n;
+			// element, alpha, beta, force, node
+			string type;
+			// element type
+		};
+
+		struct Boundary_Cond
+		{
+			double value_1, value_2;
+			string type;
+		};
+		
+		string file_path;	// Input file path
+		
+		vector<Element_Value>	alpha;
+		vector<Element_Value>	beta;
+		vector<Element_Value>	force;
+		vector<Element_Value>	nodal_cord;
+		vector<Element_Value>	nodal_flux;
+		vector<Element_Data>	Element;
+		Boundary_Cond LBC, RBC;
+
+		static void Forward(vector<vector<double>> & Matrix);
+		static vector<double> Backward(vector<vector<double>> & Matrix);
+};
+
+#endif // PROCESS_H
