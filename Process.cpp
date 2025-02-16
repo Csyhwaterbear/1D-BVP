@@ -179,6 +179,7 @@ void Process::Print_Matrix(vector<vector<double>> A)
 		}
 		cout << endl;
 	}
+	cout << endl;
 }
 
 void Process::Print_Vector(vector<double> A) {
@@ -367,8 +368,6 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_C
 // Apply Boundary Conditions
 {
 	int n = K.size();
-	cout << "Size of K before applying BC: " << n << "x" << (n > 0 ? K[0].size() : 0) << endl;
-    cout << "Size of F before applying BC: " << F.size() << endl;
 	// left Boundary Condition
 	if (LBC.type == "EBC")
 	{
@@ -392,11 +391,10 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_C
         K[0][0] += LBC.c; // c_a
         F[0] += LBC.d;    // d_a * c
     }
-    
     // Right Boundary Condition
     if (RBC.type == "EBC")
     {
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n-1; i++)
         {
             F[i] -= K[i][n-1] * RBC.c;
         }
@@ -416,6 +414,4 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_C
         K[n-1][n-1] += RBC.c; // c_b
         F[n-1] += RBC.d;      // d_b * d
     }
-    cout << "Size of K after applying BC: " << K.size() << "x" << (K.size() > 0 ? K[0].size() : 0) << endl;
-    cout << "Size of F after applying BC: " << F.size() << endl;
 }

@@ -30,7 +30,7 @@ int main()
 		{2.0, 4.0, 5.0},
 		{3.0, 5.0, 6.0}
 	};
-	cout << "check symmetric with tolence less than 1e-9 " << test1.Symmetric_Cond(C) << endl << endl;
+	cout << "check symmetric with tolence less than 1e-9 " << (test1.Symmetric_Cond(C)?"true":"false") << endl << endl;
 	/*
 	vector<double> K;
 	vector<int> Q,P;
