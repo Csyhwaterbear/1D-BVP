@@ -105,7 +105,7 @@ void Process::ParseFile()
 			Boundary_Cond data;
 			char comma;
 			getline(ss, data.type, ',');
-			ss >> data.value_1 >> comma >> data.value_2;
+			ss >> data.c >> comma >> data.d;
 			LBC = data;
 		}
 		if (currentSection == "right end BC")
@@ -114,7 +114,7 @@ void Process::ParseFile()
 			Boundary_Cond data;
 			char comma;
 			getline(ss, data.type, ',');
-			ss >> data.value_1 >> comma >> data.value_2;
+			ss >> data.c >> comma >> data.d;
 			RBC = data;
 		}		
 	}
@@ -163,9 +163,9 @@ void Process::PrintData()
 		cout << endl;
 	}
 	cout << endl;
-	cout << "left BC type: " << LBC.type << " and values " << LBC.value_1 <<", " << LBC.value_2 << endl;
+	cout << "left BC type: " << LBC.type << " and values " << LBC.c <<", " << LBC.d << endl;
 	cout << endl;
-	cout << "right BC type: " << RBC.type << " and values " << RBC.value_1 <<", " << RBC.value_2 << endl;
+	cout << "right BC type: " << RBC.type << " and values " << RBC.c <<", " << RBC.d << endl;
 	cout << endl;
 }
 
@@ -286,6 +286,7 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 	{
 		F[ nodal_flux[i].index-1 ] += nodal_flux[i].value;
 	}
+	ABC(K, F, LBC, RBC);
 	return {K, F};
 }
 
@@ -360,4 +361,61 @@ vector<double> Process::Backward(vector<vector<double>> & Matrix)
 		}
 	}
 	return x;
+}
+
+void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_Cond& LBC, const Boundary_Cond& RBC)
+// Apply Boundary Conditions
+{
+	int n = K.size();
+	cout << "Size of K before applying BC: " << n << "x" << (n > 0 ? K[0].size() : 0) << endl;
+    cout << "Size of F before applying BC: " << F.size() << endl;
+	// left Boundary Condition
+	if (LBC.type == "EBC")
+	{
+        for (int i = 0; i < n; i++)
+        {
+            F[i] -= K[i][0] * LBC.c;
+        }
+        // Remove row and column for node 1
+        K.erase(K.begin());
+        for (auto& row : K) row.erase(row.begin());
+        F.erase(F.begin());
+    }
+    else if (LBC.type == "NBC")
+    {
+        // Natural BC: Add LBC.c to F_1
+        F[0] += LBC.c;
+    }
+    else if (LBC.type == "MBC")
+    {
+        // Mixed BC: Modify K and F
+        K[0][0] += LBC.c; // c_a
+        F[0] += LBC.d;    // d_a * c
+    }
+    
+    // Right Boundary Condition
+    if (RBC.type == "EBC")
+    {
+        for (int i = 0; i < n; i++)
+        {
+            F[i] -= K[i][n-1] * RBC.c;
+        }
+        // Remove row and column for node n
+        K.pop_back();
+        for (auto& row : K) row.pop_back();
+        F.pop_back();
+    }
+    else if (RBC.type == "NBC")
+    {
+        // Natural BC: Add RBC.c to F_n
+        F[n-1] += RBC.c;
+    }
+    else if (RBC.type == "MBC")
+    {
+        // Mixed BC: Modify K and F
+        K[n-1][n-1] += RBC.c; // c_b
+        F[n-1] += RBC.d;      // d_b * d
+    }
+    cout << "Size of K after applying BC: " << K.size() << "x" << (K.size() > 0 ? K[0].size() : 0) << endl;
+    cout << "Size of F after applying BC: " << F.size() << endl;
 }

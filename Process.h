@@ -38,8 +38,10 @@ class Process
 
 		struct Boundary_Cond
 		{
-			double value_1, value_2;
+			double c, d;
+			// c, d
 			string type;
+			// element type
 		};
 		
 		string file_path;	// Input file path
@@ -54,6 +56,7 @@ class Process
 
 		static void Forward(vector<vector<double>> & Matrix);
 		static vector<double> Backward(vector<vector<double>> & Matrix);
+		void ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_Cond& LBC, const Boundary_Cond& RBC);	// Apply Boundary Conditions
 };
 
 #endif // PROCESS_H
