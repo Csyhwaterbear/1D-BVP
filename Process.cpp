@@ -154,8 +154,7 @@ void Process::PrintData()
 		<< "Alpha: " << element.a << ", "
 		<< "Beta: " << element.b << ", "
 		<< "Force: " << element.f << ", "
-		<< "Type: " << element.type << ", "
-		<< "Node: ";
+		<< "Type: " << element.type << " Node: ";
 		for (const auto& node : element.n)
 		{
 			cout << node << " ";
@@ -264,7 +263,7 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 		else if (Element[i].type == "1DC0Q,")
 		{
 			int nb = Element[i].n[0] - 1, nm = Element[i].n[1] - 1, ne = Element[i].n[2] - 1;
-
+			// textbook (T4L4-7)
 			K[nb][nb] += (7 * A) / (3 * L) + (4* B * L) / 30;
 			K[ne][ne] += (16 * A) / (3 * L) + (16 * B * L) / 30;
 			K[nm][nm] += (7 * A) / (3 * L) + (4 * B * L) / 30;
@@ -287,8 +286,46 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 	{
 		F[ nodal_flux[i].index-1 ] += nodal_flux[i].value;
 	}
+	Print_Matrix(K);
+	Print_Vector(F);
 	ABC(K, F, LBC, RBC);
+//	Print_Matrix(K);
+//	Print_Vector(F);
 	return {K, F};
+}
+
+void Process::Print_Solution()
+{
+	auto [K, F] = Build();
+	vector<double> solution = Solve(K, F);
+	if (!solution.empty())
+	{
+		cout << "Solution vector:" << endl;
+		int Index = 1;
+		if (LBC.type == "EBC")
+        {
+            cout << "Node " << Index << ": " << LBC.c << " (fixed)" << endl;
+            Index++;
+        }
+        else
+        {
+            cout << "Node " << Index << ": " << solution[0] << endl;
+            Index++;
+        }
+        for (size_t i = (LBC.type == "EBC" ? 0 : 1); i < solution.size(); ++i)
+        {
+            cout << "Node " << Index << ": " << solution[i] << endl;
+            Index++;
+        }
+        if (RBC.type == "EBC")
+        {
+            cout << "Node " << Index << ": " << RBC.c << " (fixed)" << endl;
+        }
+	}
+	else
+    {
+        cerr << "Error: Solution vector is empty!" << endl;
+    }
 }
 
 bool Process::Symmetric_Cond(vector<vector<double>> A)

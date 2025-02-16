@@ -9,15 +9,16 @@ using namespace std;
 class Process
 {
 	public:
-		void Input(const std::string& file_path);
-		void ParseFile(); // Reads the file once and stores data
-		void PrintData(); // Prints all stored values
-		void Print_Matrix(vector<vector<double>> A);
-		void Print_Vector(vector<double> A);
-		bool Symmetric_Cond(vector<vector<double>> A);
+		void Input(const std::string& file_path);		// Get input file path
+		void ParseFile();	// Reads the file once and stores data
+		void PrintData();	// Prints all input values
+		void Print_Matrix(vector<vector<double>> A);	// Print Matrix
+		void Print_Vector(vector<double> A);			// Print Vector
+		bool Symmetric_Cond(vector<vector<double>> A);	// Symmetric matrix check
 		vector<double> Solve(vector<vector<double>> & A, vector<double> & B);
-		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);
-		tuple<vector<vector<double>>, vector<double>> Build();
+		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);	// CSR store
+		tuple<vector<vector<double>>, vector<double>> Build();	// KDF build
+		void Print_Solution();
 	private:
 		
 		struct Element_Value
