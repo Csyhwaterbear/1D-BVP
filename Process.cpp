@@ -262,6 +262,7 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 		}
 		else if (Element[i].type == "1DC0Q,")
 		{
+			L /= 2;
 			int nb = Element[i].n[0] - 1, nm = Element[i].n[1] - 1, ne = Element[i].n[2] - 1;
 			// textbook (T4L4-7)
 			K[nb][nb] += (7 * A) / (3 * L) + (4* B * L) / 30;
@@ -310,21 +311,21 @@ vector<double> Process::Solution()
         }
 	}
 	else
-    {
-        cerr << "Error: Solution vector is empty!" << endl;
-    }
-    return solution;
+	{
+		cerr << "Error: Solution vector is empty!" << endl;
+	}
+	return solution;
 }
 
 vector<double> Process::Flux(const vector<double> &Sol)
 {
 	int n = Sol.size();
-	vector<double> flux(n-1, 0.0);
-	for (int i = 0; i < n-1; i++)
+	vector<double> flux(Element.size(), 0.0);
+	for (int i = 0; i < Element.size(); i++)
 	{
-    	double L = abs( nodal_cord[ Element[i].n.back()-1 ].value - nodal_cord[ Element[i].n.front()-1 ].value );
-    	double A = alpha[(Element[i].a-1)].value;
-		flux[i] = (Sol[i+1] - Sol[i]) / L * A;
+		double L = abs( nodal_cord[ Element[i].n.back()-1 ].value - nodal_cord[ Element[i].n.front()-1 ].value );
+		double A = alpha[(Element[i].a-1)].value;
+		flux[i] = -(Sol[i+1] - Sol[i]) / L * A;
 	}
 	return flux;
 }
@@ -409,47 +410,47 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_C
 	// left Boundary Condition
 	if (LBC.type == "EBC")
 	{
-        for (int i = 0; i < n; i++)
-        {
-            F[i] -= K[i][0] * LBC.c;
-        }
-        // Remove row and column for node 1
-        K.erase(K.begin());
-        for (auto& row : K) row.erase(row.begin());
-        F.erase(F.begin());
-    }
-    else if (LBC.type == "NBC")
-    {
-        // Natural BC: Add LBC.c to F_1
-        F[0] += LBC.c;
-    }
-    else if (LBC.type == "MBC")
-    {
-        // Mixed BC: Modify K and F
-        K[0][0] += LBC.c; // c_a
-        F[0] += LBC.d;    // d_a * c
-    }
-    // Right Boundary Condition
-    if (RBC.type == "EBC")
-    {
-        for (int i = 0; i < n-1; i++)
-        {
-            F[i] -= K[i][n-1] * RBC.c;
-        }
-        // Remove row and column for node n
-        K.pop_back();
-        for (auto& row : K) row.pop_back();
-        F.pop_back();
-    }
-    else if (RBC.type == "NBC")
-    {
-        // Natural BC: Add RBC.c to F_n
-        F[n-1] += RBC.c;
-    }
-    else if (RBC.type == "MBC")
-    {
-        // Mixed BC: Modify K and F
-        K[n-1][n-1] += RBC.c; // c_b
-        F[n-1] += RBC.d;      // d_b * d
-    }
+        	for (int i = 0; i < n; i++)
+        	{
+			F[i] -= K[i][0] * LBC.c;
+		}
+		// Remove row and column for node 1
+		K.erase(K.begin());
+		for (auto& row : K) row.erase(row.begin());
+		F.erase(F.begin());
+	}
+	else if (LBC.type == "NBC")
+	{
+		// Natural BC: Add LBC.c to F_1
+		F[0] += LBC.d;
+	}
+	else if (LBC.type == "MBC")
+	{
+		// Mixed BC: Modify K and F
+		K[0][0] -= LBC.c; // c_a
+		F[0] += LBC.d;    // d_a * c
+	}
+	// Right Boundary Condition
+	if (RBC.type == "EBC")
+	{
+	 	for (int i = 0; i < n-1; i++)
+		{
+			F[i] -= K[i][n-1] * RBC.c;
+		}
+		// Remove row and column for node n
+		K.pop_back();
+		for (auto& row : K) row.pop_back();
+		F.pop_back();
+	}
+	else if (RBC.type == "NBC")
+	{
+		// Natural BC: Add RBC.c to F_n
+		F[n-1] -= RBC.d;
+	}
+	else if (RBC.type == "MBC")
+	{
+		// Mixed BC: Modify K and F
+		K[n-1][n-1] += RBC.c; // c_b
+		F[n-1] -= RBC.d;      // d_b * d
+	}
 }
