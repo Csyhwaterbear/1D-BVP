@@ -5,7 +5,7 @@ using namespace std;
 int main()
 {
 	Process test1;
-	test1.Input("./Test Model 1.txt");
+	test1.Input("./Test Model 3.txt");
 	test1.PrintData();
 
 //	vector<vector<double>> A = {
@@ -50,12 +50,14 @@ int main()
 //	cout << endl;
 
 	vector<vector<double>> K;
-	vector<double> F;
+	vector<double> F, D, flux;
 	tie(K, F) = test1.Build();
 //	test1.Print_Matrix(K);
 //	test1.Print_Vector(F);
 //	test1.Print_Vector(test1.Solve(K, F));
-	test1.Print_Solution();
-
+	D = test1.Solution();
+	test1.Print_Vector(D);
+	flux = test1.Flux(D);
+	test1.Print_Vector(flux);
 	return 0;
 }

@@ -289,43 +289,44 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 	Print_Matrix(K);
 	Print_Vector(F);
 	ABC(K, F, LBC, RBC);
-//	Print_Matrix(K);
-//	Print_Vector(F);
+	Print_Matrix(K);
+	Print_Vector(F);
 	return {K, F};
 }
 
-void Process::Print_Solution()
+vector<double> Process::Solution()
 {
 	auto [K, F] = Build();
 	vector<double> solution = Solve(K, F);
 	if (!solution.empty())
 	{
-		cout << "Solution vector:" << endl;
-		int Index = 1;
 		if (LBC.type == "EBC")
         {
-            cout << "Node " << Index << ": " << LBC.c << " (fixed)" << endl;
-            Index++;
-        }
-        else
-        {
-            cout << "Node " << Index << ": " << solution[0] << endl;
-            Index++;
-        }
-        for (size_t i = (LBC.type == "EBC" ? 0 : 1); i < solution.size(); ++i)
-        {
-            cout << "Node " << Index << ": " << solution[i] << endl;
-            Index++;
+            solution.insert(solution.begin(), LBC.c);
         }
         if (RBC.type == "EBC")
         {
-            cout << "Node " << Index << ": " << RBC.c << " (fixed)" << endl;
+            solution.push_back(RBC.c);
         }
 	}
 	else
     {
         cerr << "Error: Solution vector is empty!" << endl;
     }
+    return solution;
+}
+
+vector<double> Process::Flux(const vector<double> &Sol)
+{
+	int n = Sol.size();
+	vector<double> flux(n-1, 0.0);
+	for (int i = 0; i < n-1; i++)
+	{
+    	double L = abs( nodal_cord[ Element[i].n.back()-1 ].value - nodal_cord[ Element[i].n.front()-1 ].value );
+    	double A = alpha[(Element[i].a-1)].value;
+		flux[i] = (Sol[i+1] - Sol[i]) / L * A;
+	}
+	return flux;
 }
 
 bool Process::Symmetric_Cond(vector<vector<double>> A)

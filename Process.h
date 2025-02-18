@@ -18,7 +18,9 @@ class Process
 		vector<double> Solve(vector<vector<double>> & A, vector<double> & B);
 		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);	// CSR store
 		tuple<vector<vector<double>>, vector<double>> Build();	// KDF build
-		void Print_Solution();
+		vector<double> Solution();
+		
+		vector<double> Flux(const vector<double> &Sol);
 	private:
 		
 		struct Element_Value
