@@ -5,7 +5,7 @@ using namespace std;
 int main()
 {
 	Process test1;
-	test1.Input("./Test Model 2.txt");
+	test1.Input("./Test Model 4.txt");
 	test1.PrintData();
 
 //	vector<vector<double>> A = {

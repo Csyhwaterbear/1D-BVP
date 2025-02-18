@@ -262,12 +262,12 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 		}
 		else if (Element[i].type == "1DC0Q,")
 		{
-			L /= 2;
+			//L /= 2.0;
 			int nb = Element[i].n[0] - 1, nm = Element[i].n[1] - 1, ne = Element[i].n[2] - 1;
 			// textbook (T4L4-7)
 			K[nb][nb] += (7 * A) / (3 * L) + (4* B * L) / 30;
-			K[ne][ne] += (16 * A) / (3 * L) + (16 * B * L) / 30;
-			K[nm][nm] += (7 * A) / (3 * L) + (4 * B * L) / 30;
+			K[nm][nm] += (16 * A) / (3 * L) + (16 * B * L) / 30;
+			K[ne][ne] += (7 * A) / (3 * L) + (4 * B * L) / 30;
 			
 			K[nb][ne] += (A) / (3 * L) - (B * L) / 30;
 			K[ne][nb] += (A) / (3 * L) - (B * L) / 30;
@@ -278,9 +278,9 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 			K[ne][nm] += (-8 * A) / (3 * L) + (2 * B * L) / 30;
 			K[nm][ne] += (-8 * A) / (3 * L) + (2 * B * L) / 30;
 			
-			F[nb] += (f * L) / 6;
-			F[nm] += (2 * f * L) / 3;
-			F[ne] += (f * L) / 6;
+			F[nb] += (1 * f * L) / 6;
+			F[nm] += (4 * f * L) / 6;
+			F[ne] += (1 * f * L) / 6;
 		}
 	}
 	for ( int i = 0; i < nodal_flux.size(); i++ )
