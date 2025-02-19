@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
 	Process test1;
-	string inputFilePath = "./Test Model 2.txt";
+	string inputFilePath = "./Test Model 1.txt";
 	test1.Input( inputFilePath );
 	test1.PrintData();
 
@@ -54,9 +54,6 @@ int main()
 	vector<vector<double>> K;
 	vector<double> F, D, flux;
 	tie(K, F) = test1.Build();
-//	test1.Print_Matrix(K);
-//	test1.Print_Vector(F);
-//	test1.Print_Vector(test1.Solve(K, F));
 	D = test1.Solution();
 	test1.Print_Vector(D);
 	flux = test1.Flux(D);
