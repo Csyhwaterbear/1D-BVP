@@ -19,7 +19,7 @@ class Process
 		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);	// CSR store
 		tuple<vector<vector<double>>, vector<double>> Build();	// KDF build
 		vector<double> Solution();
-		
+		void PrintFormattedOutput(ofstream& outFile);
 		vector<double> Flux(const vector<double> &Sol);
 	private:
 		

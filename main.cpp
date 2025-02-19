@@ -1,11 +1,13 @@
 # include <iostream>
+# include <fstream>
 # include "Process.h"
 using namespace std;
 
 int main()
 {
 	Process test1;
-	test1.Input("./Test Model 4.txt");
+	string inputFilePath = "./Test Model 2.txt";
+	test1.Input( inputFilePath );
 	test1.PrintData();
 
 //	vector<vector<double>> A = {
@@ -59,5 +61,26 @@ int main()
 	test1.Print_Vector(D);
 	flux = test1.Flux(D);
 	test1.Print_Vector(flux);
+	
+	// Create output file name
+	size_t lastDot = inputFilePath.find_last_of(".");
+	string outputFilePath = inputFilePath.substr(0, lastDot) + ".out";
+	
+	// Open the output file
+	ofstream outFile(outputFilePath);
+	if (!outFile.is_open())
+	{
+		cerr << "Error: Unable to open output file: " << outputFilePath << endl;
+		return 1;
+	}
+
+	// Print formatted output to the file
+	test1.PrintFormattedOutput(outFile);
+	
+	// Close the file
+	outFile.close();
+	
+	cout << "Output written to: " << outputFilePath << endl;
+
 	return 0;
 }

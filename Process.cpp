@@ -317,6 +317,110 @@ vector<double> Process::Solution()
 	return solution;
 }
 
+void Process::PrintFormattedOutput(ofstream& outFile) {
+	outFile << "---------------------------------------------" << endl;
+	outFile << "            1D Boundary Value Program         " << endl;
+	outFile << "          Finite Elements for Engineers       " << endl;
+	outFile << "           (c) 1998-2022, S. D. Rajan         " << endl;
+	outFile << "               Version: 3.4. Rev: 3           " << endl;
+	outFile << "---------------------------------------------" << endl;
+	outFile << endl;
+	outFile << "Date: 02/18/25. Time: 09:50 PM" << endl;
+	outFile << endl;
+	outFile << endl;
+	
+	// Print details of the finite element model
+	outFile << "          DETAILS OF FINITE ELEMENT MODEL" << endl;
+ 	outFile << "          -------------------------------" << endl;
+	outFile << "               Number of Nodes: " << nodal_cord.size() << endl;
+	outFile << "            Number of Elements: " << Element.size() << endl;
+	outFile << endl;
+	
+	// Print nodal data
+	outFile << "                                  Nodal Data" << endl;
+	outFile << "                           -------------------------" << endl;
+	outFile << "                           Node      X Coor         " << endl;
+	outFile << "                           -------------------------" << endl;
+	for (const auto& nc : nodal_cord)
+	{
+		outFile << "                           " << nc.index << "         " << nc.value << "              " << endl;
+	}
+	outFile << endl;
+
+	// Print nodal boundary conditions
+	outFile << "                           Nodal Boundary Conditions" << endl;
+	outFile << "               --------------------------------------------------" << endl;
+	outFile << "               Node      BC        Value 1        Value 2        " << endl;
+	outFile << "               --------------------------------------------------" << endl;
+	outFile << "               1         " << LBC.type << "       " << LBC.c << "                         " << endl;
+	outFile << "               " << nodal_cord.size() << "         " << RBC.type << "       " << RBC.c << "                         " << endl;
+	outFile << endl;
+	
+	// Print applied nodal flux
+	outFile << "                              Applied Nodal Flux" << endl;
+	outFile << "                           -------------------------" << endl;
+	outFile << "                           Node      Flux           " << endl;
+	outFile << "                           -------------------------" << endl;
+	for (const auto& nf : nodal_flux)
+	{
+		outFile << "                           " << nf.index << "         " << nf.value << "              " << endl;
+	}
+	outFile << endl;
+	
+	// Print element data
+	outFile << "                                 Element Data" << endl;
+	outFile << "       -----------------------------------------------------------------" << endl;
+	outFile << "       Element   Type           Int. Order     List of Nodes ...        " << endl;
+	outFile << "       -----------------------------------------------------------------" << endl;
+	for (const auto& element : Element)
+	{
+		outFile << "       " << element.e << "         " << element.type << "   4              ";
+		for (const auto& node : element.n)
+		{
+			outFile << node << "    ";
+		}
+		outFile << endl;
+	}
+	outFile << endl;
+
+	// Print element properties
+	outFile << "                               Element Properties" << endl;
+	outFile << "     ----------------------------------------------------------------------" << endl;
+	outFile << "     Element   Qty            x**2           x              constant       " << endl;
+	outFile << "     ----------------------------------------------------------------------" << endl;
+	for (const auto& element : Element)
+	{
+		outFile << "     " << element.e << "         Alpha          0              0              " << alpha[element.a - 1].value << "          " << endl;
+		outFile << "               Beta           0              0              " << beta[element.b - 1].value << "          " << endl;
+		outFile << "               f              0              0              " << force[element.f - 1].value << "          " << endl;
+	}
+	outFile << endl;
+
+	// Print nodal values
+	vector<double> solution = Solution();
+	outFile << "                                  Nodal Values" << endl;
+	outFile << "                    ----------------------------------------" << endl;
+	outFile << "                    Node      Location       Value          " << endl;
+	outFile << "                    ----------------------------------------" << endl;
+	for (size_t i = 0; i < solution.size(); ++i)
+	{
+		outFile << "                    " << i + 1 << "         " << nodal_cord[i].value << "              " << solution[i] << "          " << endl;
+	}
+	outFile << endl;
+	
+	// Print element flux
+	vector<double> flux = Flux(solution);
+	outFile << "                                  Element Flux" << endl;
+	outFile << "                    ----------------------------------------" << endl;
+	outFile << "                    Element   Location       Flux           " << endl;
+	outFile << "                    ----------------------------------------" << endl;
+	for (size_t i = 0; i < flux.size(); ++i)
+	{
+		outFile << "                    " << i + 1 << "         " << nodal_cord[i].value << "              " << flux[i] << "          " << endl;
+	}
+	outFile << endl;
+}
+
 vector<double> Process::Flux(const vector<double> &Sol)
 {
 	int n = Sol.size();
