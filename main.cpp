@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
 	Process test1;
-	string inputFilePath = "./Test Model 1.txt";
+	string inputFilePath = "./Test Model 3.txt";
 	test1.Input( inputFilePath );
 	test1.PrintData();
 
