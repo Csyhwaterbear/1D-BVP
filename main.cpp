@@ -1,67 +1,73 @@
 # include <iostream>
 # include <fstream>
+# include <limits>
+# include <algorithm>
+# include <cctype>
 # include "Process.h"
 using namespace std;
 
+std::string trim(const std::string& str) {
+	auto start = str.begin();
+	while (start != str.end() && std::isspace(*start))
+	{
+		start++;
+	}
+	auto end = str.end();
+	while (end != start && std::isspace(*(end - 1)))
+	{
+		end--;
+	}
+	return std::string(start, end);
+}
+
 int main()
 {
+	// input 
+	int Debug_Level;
+	string inputFilePath, outputFilePath;
+	
+	cout << "Enter debug level" << endl;
+	cout << "Enter 0: Regular output" << endl;
+	cout << "Enter 1: Regular output with System stiffness matrix and the system load vector." << endl;
+	cout << "Enter 2: Regular output Element stiffness matrix, element load vector, system  stiffness matrix and the system load vector." << endl;
+	cin >> Debug_Level;
+	
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	
+	cout << "Enter input File name, like Input_Name.txt" << endl;
+	getline(cin, inputFilePath);
+	inputFilePath = "./" + trim(inputFilePath);
+	
+	ifstream inputFile(inputFilePath);
+	while (!inputFile.is_open())
+	{
+		cerr << "Unable to open input file: " << inputFilePath << endl;
+		cout << "Please enter a valid input file name: ";
+		getline(cin, inputFilePath);
+		inputFilePath = "./" + trim(inputFilePath);
+		inputFile.open(inputFilePath);
+	}
+	inputFile.close();
+
+	cout << "Enter output File name, like Output_Name.out" << endl;
+	getline(cin, outputFilePath);
+	outputFilePath = "./" + trim(outputFilePath);
+	
+	
 	Process test1;
-	string inputFilePath = "./Test Model 3.txt";
+	
 	test1.Input( inputFilePath );
 	test1.PrintData();
-
-//	vector<vector<double>> A = {
-//		{2.2, 1.1, -19.1},
-//		{-3.2 , -1.0, 2.3},
-//		{-2.3, 1.1, 2.4}
-//	};
-//	vector<double> B = {8.8, -11.7, -3.5};
-//	test1.Print_Matrix(A);
-//	vector<double> X = test1.Solve(A, B);
-//	if ( !X.empty() )
-//	{
-//		cout << "Solution vector X:" << endl;
-//		for (const auto& x : X)
-//		{
-//			cout << x << endl;
-//		}
-//	}
-//	
-//	vector<vector<double>> C = {
-//		{1.0, 2.0, 3.0},
-//		{2.0, 4.0, 5.0},
-//		{3.0, 5.0, 6.0}
-//	};
-//	cout << "check symmetric with tolence less than 1e-9 " << (test1.Symmetric_Cond(C)?"true":"false") << endl << endl;
-//	vector<double> K;
-//	vector<int> Q,P;
-//	tie(K, Q, P) = test1.CSR(C);
-//	// OR auto [K, Q, P] = Sol.CSR(C);
-//	cout << "K: ";
-//	for (double val : K) cout << val << " ";
-//	cout << endl;
-
-//	cout << "Q: ";
-//	for (int val : Q) cout << val << " ";
-//	cout << endl;
-
-//	cout << "P: ";
-//	for (int val : P) cout << val << " ";
-//	cout << endl;
-
-//	cout << endl;
 
 	vector<vector<double>> K;
 	vector<double> F, D, flux;
 	tie(K, F) = test1.Build();
 	D = test1.Solution();
-	test1.Print_Vector(D);
 	flux = test1.Flux(D);
-	test1.Print_Vector(flux);
-	
+
 	// Create output file name
 	size_t lastDot = inputFilePath.find_last_of(".");
-	string outputFilePath = inputFilePath.substr(0, lastDot) + ".out";
+	// string outputFilePath = inputFilePath.substr(0, lastDot) + ".out";
 	
 	// Open the output file
 	ofstream outFile(outputFilePath);
