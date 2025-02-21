@@ -4,9 +4,12 @@
 #include <fstream>
 #include <sstream>
 #include <ctime>
-#include <limits>
 #include "Process.h"
 using namespace std;
+void Process::Get_Debug_Level(int num)
+{
+	Debug_Level = num;
+}
 
 void Process::Input(const string& file_path)
 {
@@ -208,36 +211,36 @@ vector<double> Process::Solve(vector<vector<double>> & A, vector<double> & B)
 	return Backward(Matrix);
 }
 
-tuple< vector<double>, vector<int>, vector<int> > Process::CSR(vector<vector<double>> A)
-{
-	if ( Symmetric_Cond( A ) )
-	{
-		int n = A.size();
-		vector<double> K;
-		vector<int> C, R;
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = i; j < n; j++)
-			{
-				if ( abs(A[i][j]) >= 1e-9 )
-				{
-					K.push_back(A[i][j]);
-					C.push_back(j);
-					if( j == i )
-					{
-						R.push_back(K.size()-1);
-					}
-				}
-			}
-		}
-		return {K, C, R};
-	}
-	else
-	{
-		cerr << "Error: Invalid input Matrix dimensions or not a symmetric matrix!" << endl;
-		return {{}, {}, {}};
-	}
-}
+//tuple< vector<double>, vector<int>, vector<int> > Process::CSR(vector<vector<double>> A)
+//{
+//	if ( Symmetric_Cond( A ) )
+//	{
+//		int n = A.size();
+//		vector<double> K;
+//		vector<int> C, R;
+//		for (int i = 0; i < n; i++)
+//		{
+//			for (int j = i; j < n; j++)
+//			{
+//				if ( abs(A[i][j]) >= 1e-9 )
+//				{
+//					K.push_back(A[i][j]);
+//					C.push_back(j);
+//					if( j == i )
+//					{
+//						R.push_back(K.size()-1);
+//					}
+//				}
+//			}
+//		}
+//		return {K, C, R};
+//	}
+//	else
+//	{
+//		cerr << "Error: Invalid input Matrix dimensions or not a symmetric matrix!" << endl;
+//		return {{}, {}, {}};
+//	}
+//}
 
 tuple<vector<vector<double>>, vector<double>> Process::Build()
 {
@@ -264,9 +267,7 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 		}
 		else if (Element[i].type == "1DC0Q,")
 		{
-			//L /= 2.0;
 			int nb = Element[i].n[0] - 1, nm = Element[i].n[1] - 1, ne = Element[i].n[2] - 1;
-			// textbook (T4L4-7)
 			K[nb][nb] += (7 * A) / (3 * L) + (4* B * L) / 30;
 			K[nm][nm] += (16 * A) / (3 * L) + (16 * B * L) / 30;
 			K[ne][ne] += (7 * A) / (3 * L) + (4 * B * L) / 30;
@@ -289,28 +290,25 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 	{
 		F[ nodal_flux[i].index-1 ] += nodal_flux[i].value;
 	}
-	Print_Matrix(K);
-	Print_Vector(F);
-	ABC(K, F, LBC, RBC);
-	Print_Matrix(K);
-	Print_Vector(F);
+	
 	return {K, F};
 }
 
 vector<double> Process::Solution()
 {
 	auto [K, F] = Build();
+	ABC(K, F);
 	vector<double> solution = Solve(K, F);
 	if (!solution.empty())
 	{
 		if (LBC.type == "EBC")
-        {
-            solution.insert(solution.begin(), LBC.c);
-        }
-        if (RBC.type == "EBC")
-        {
-            solution.push_back(RBC.c);
-        }
+		{
+			solution.insert(solution.begin(), LBC.c);
+		}
+		if (RBC.type == "EBC")
+		{
+			solution.push_back(RBC.c);
+		}
 	}
 	else
 	{
@@ -321,133 +319,201 @@ vector<double> Process::Solution()
 
 void Process::PrintFormattedOutput(ofstream& outFile)
 {
-	outFile << "		           1D Boundary Value Program         " << endl;
-	outFile << "		         Finite Elements for Engineers       " << endl;
-	outFile << "		          (c) 2025, S. CSYH                  " << endl;
-	outFile << "		              Version: 1.0. Rev: 1           " << endl;
+	outFile << "				   1D Boundary Value Program		 " << endl;
+	outFile << "				 Finite Elements for Engineers	   " << endl;
+	outFile << "				  (c) 2025, S. CSYH				  " << endl;
+	outFile << "					  Version: 1.0. Rev: 1		   " << endl;
 	outFile << "		---------------------------------------------" << endl;
 	outFile << endl;
 	
 	// Print details of the finite element model
-	outFile << "          DETAILS OF FINITE ELEMENT MODEL" << endl;
- 	outFile << "          -------------------------------" << endl;
-	outFile << "               Number of Nodes: " << nodal_cord.size() << endl;
-	outFile << "            Number of Elements: " << Element.size() << endl;
+	outFile << "		  DETAILS OF FINITE ELEMENT MODEL" << endl;
+ 	outFile << "		  -------------------------------" << endl;
+	outFile << "			   Number of Nodes: " << nodal_cord.size() << endl;
+	outFile << "			Number of Elements: " << Element.size() << endl;
 	outFile << endl;
 	
 	// Print nodal data
-	outFile << "                                  Nodal Data" << endl;
-	outFile << "                           -------------------------" << endl;
-	outFile << "                           Node      X Coor         " << endl;
-	outFile << "                           -------------------------" << endl;
+	outFile << "								  Nodal Data" << endl;
+	outFile << "						   -------------------------" << endl;
+	outFile << "						   Node	  X Coor		 " << endl;
+	outFile << "						   -------------------------" << endl;
 	for (const auto& nc : nodal_cord)
 	{
-		outFile << std::left << "                           " << std::setw(20) << nc.index <<  nc.value << endl;
+		outFile << std::left << "						   " << std::setw(20) << nc.index <<  nc.value << endl;
 	}
 	outFile << endl;
 
 	// Print nodal boundary conditions
-	outFile << "                           Nodal Boundary Conditions" << endl;
-	outFile << "               --------------------------------------------------" << endl;
-	outFile << "               Node      BC        Value 1        Value 2        " << endl;
-	outFile << "               --------------------------------------------------" << endl;
+	outFile << "						   Nodal Boundary Conditions" << endl;
+	outFile << "			   --------------------------------------------------" << endl;
+	outFile << "			   Node	  BC		Value 1		Value 2		" << endl;
+	outFile << "			   --------------------------------------------------" << endl;
 	if (LBC.type == "MBC")
 	{
-        outFile << std::left << "                " << std::setw(10) << 1 << std::setw(14) << LBC.type << std::setw(15) << LBC.c << std::setw(15) << LBC.d << std::endl;
-    }
-    else if (LBC.type == "EBC")
-    {
-        outFile << std::left << "                " << std::setw(10) << 1 << std::setw(14) << LBC.type << std::setw(15) << LBC.c << std::setw(15) << " " << std::endl;
-    }
-    else if (LBC.type == "NBC")
-    {
-        outFile << std::left << "                " << std::setw(10) << 1 << std::setw(14) << LBC.type << std::setw(15) << " " << std::setw(15) << LBC.d << std::endl;
-    }
+		outFile << std::left << "				" << std::setw(10) << 1 << std::setw(14) << LBC.type << std::setw(15) << LBC.c << std::setw(15) << LBC.d << std::endl;
+	}
+	else if (LBC.type == "EBC")
+	{
+		outFile << std::left << "				" << std::setw(10) << 1 << std::setw(14) << LBC.type << std::setw(15) << LBC.c << std::setw(15) << " " << std::endl;
+	}
+	else if (LBC.type == "NBC")
+	{
+		outFile << std::left << "				" << std::setw(10) << 1 << std::setw(14) << LBC.type << std::setw(15) << " " << std::setw(15) << LBC.d << std::endl;
+	}
 	if (RBC.type == "MBC")
 	{
-        outFile << std::left << "                " << std::setw(10) << 1 << std::setw(14) << RBC.type << std::setw(15) << RBC.c << std::setw(15) << RBC.d << std::endl;
-    }
-    else if (RBC.type == "EBC")
-    {
-        outFile << std::left << "                " << std::setw(10) << 1 << std::setw(14) << RBC.type << std::setw(15) << RBC.c << std::setw(15) << " " << std::endl;
-    }
-    else if (RBC.type == "NBC")
-    {
-        outFile << std::left << "                " << std::setw(10) << 1 << std::setw(14) << RBC.type << std::setw(15) << " " << std::setw(15) << RBC.d << std::endl;
-    }
+		outFile << std::left << "				" << std::setw(10) << 1 << std::setw(14) << RBC.type << std::setw(15) << RBC.c << std::setw(15) << RBC.d << std::endl;
+	}
+	else if (RBC.type == "EBC")
+	{
+		outFile << std::left << "				" << std::setw(10) << 1 << std::setw(14) << RBC.type << std::setw(15) << RBC.c << std::setw(15) << " " << std::endl;
+	}
+	else if (RBC.type == "NBC")
+	{
+		outFile << std::left << "				" << std::setw(10) << 1 << std::setw(14) << RBC.type << std::setw(15) << " " << std::setw(15) << RBC.d << std::endl;
+	}
 	outFile << endl;
 	
 	// Print applied nodal flux
-	outFile << "                              Applied Nodal Flux" << endl;
-	outFile << "                           -------------------------" << endl;
-	outFile << "                           Node      Flux           " << endl;
-	outFile << "                           -------------------------" << endl;
+	outFile << "							  Applied Nodal Flux" << endl;
+	outFile << "						   -------------------------" << endl;
+	outFile << "						   Node	  Flux		   " << endl;
+	outFile << "						   -------------------------" << endl;
 	for (const auto& nf : nodal_flux)
 	{
-		outFile << "                           " << nf.index << "         " << nf.value << "              " << endl;
+		outFile << "						   " << nf.index << "		 " << nf.value << "			  " << endl;
 	}
 	outFile << endl;
 	
 	// Print element data
-	outFile << "                                 Element Data" << endl;
-	outFile << "       -----------------------------------------------------------------" << endl;
-	outFile << "       Element   Type           Int. Order     List of Nodes ...        " << endl;
-	outFile << "       -----------------------------------------------------------------" << endl;
+	outFile << "								 Element Data" << endl;
+	outFile << "	   -----------------------------------------------------------------" << endl;
+	outFile << "	   Element   Type		   Int. Order	 List of Nodes ...		" << endl;
+	outFile << "	   -----------------------------------------------------------------" << endl;
 	for (const auto& element : Element)
 	{
-		outFile << "       " << element.e << "         ";
+		outFile << "	   " << element.e << "		 ";
 		if ( element.type == "1DC0L,")
 		{
-			outFile << "C0-Linear" << "      " << 2 << "              ";
+			outFile << "C0-Linear" << "	  " << 2 << "			  ";
 		}
 		else if ( element.type == "1DC0Q,")
 		{
-			outFile << "C0-Quadratic" << "   " << 3 << "              ";
+			outFile << "C0-Quadratic" << "   " << 3 << "			  ";
 		}
 		for (const auto& node : element.n)
 		{
-			outFile << node << "    ";
+			outFile << node << "	";
 		}
 		outFile << endl;
 	}
 	outFile << endl;
 
 	// Print element properties
-	outFile << "                               Element Properties" << endl;
-	outFile << "     ----------------------------------------------------------------------" << endl;
-	outFile << "     Element   Qty            x**2           x              constant       " << endl;
-	outFile << "     ----------------------------------------------------------------------" << endl;
+	outFile << "							   Element Properties" << endl;
+	outFile << "	 ----------------------------------------------------------------------" << endl;
+	outFile << "	 Element   Qty			x**2		   x			  constant	   " << endl;
+	outFile << "	 ----------------------------------------------------------------------" << endl;
 	for (const auto& element : Element)
 	{
-		outFile << "    " << element.e << "          Alpha          0              0              " << alpha[element.a - 1].value << "          " << endl;
-		outFile << "               Beta             0              0              " << beta[element.b - 1].value << "          " << endl;
-		outFile << "               f                    0              0              " << force[element.f - 1].value << "          " << endl;
+		outFile << "	" << element.e << "		  Alpha		  0			  0			  " << alpha[element.a - 1].value << "		  " << endl;
+		outFile << "			   Beta			 0			  0			  " << beta[element.b - 1].value << "		  " << endl;
+		outFile << "			   f					0			  0			  " << force[element.f - 1].value << "		  " << endl;
 	}
 	outFile << endl;
 
 	// Print nodal values
 	vector<double> solution = Solution();
-	outFile << "                                  Nodal Values" << endl;
-	outFile << "                    ----------------------------------------" << endl;
-	outFile << "                    Node      Location       Value          " << endl;
-	outFile << "                    ----------------------------------------" << endl;
+	outFile << "								  Nodal Values" << endl;
+	outFile << "					----------------------------------------" << endl;
+	outFile << "					Node	  Location	   Value		  " << endl;
+	outFile << "					----------------------------------------" << endl;
 	for (size_t i = 0; i < solution.size(); ++i)
 	{
-		outFile << "                    " << i + 1 << "             " << nodal_cord[i].value << "                " << solution[i] << "          " << endl;
+		outFile << "					" << i + 1 << "			 " << nodal_cord[i].value << "				" << solution[i] << "		  " << endl;
 	}
 	outFile << endl;
 	
 	// Print element flux
 	vector<double> flux = Flux(solution);
-	outFile << "                                  Element Flux" << endl;
-	outFile << "                    ----------------------------------------" << endl;
-	outFile << "                    Element   Location       Flux           " << endl;
-	outFile << "                    ----------------------------------------" << endl;
+	outFile << "								  Element Flux" << endl;
+	outFile << "					----------------------------------------" << endl;
+	outFile << "					Element   Location	   Flux		   " << endl;
+	outFile << "					----------------------------------------" << endl;
 	for (size_t i = 0; i < flux.size(); ++i)
 	{
-		outFile << "                    " << i + 1 << "               " << nodal_cord[i].value << "              " << flux[i] << "          " << endl;
+		outFile << "					" << i + 1 << "			   " << nodal_cord[i].value << "			  " << flux[i] << "		  " << endl;
 	}
 	outFile << endl;
+	
+	// Debug Level 1: Print System Stiffness Matrix and System Load Vector
+	if (Debug_Level >= 1) {
+		auto [K, F] = Build();
+
+		outFile << "						  System Stiffness Matrix" << endl;
+		outFile << "					--------------------------------" << endl;
+		for (const auto& row : K)
+		{
+			for (const auto& element : row)
+			{
+				outFile << setw(15) << element << " ";
+			}
+			outFile << endl;
+		}
+		outFile << endl;
+		
+		outFile << "						  System Load Vector" << endl;
+		outFile << "					--------------------------------" << endl;
+		for (const auto& element : F)
+		{
+			outFile << setw(15) << element << endl;
+		}
+		outFile << endl;
+	}
+	if (Debug_Level == 2)
+	{
+		for ( int i = 0; i < Element.size(); i++ )
+		{
+			double L = abs( nodal_cord[ Element[i].n.back()-1 ].value - nodal_cord[ Element[i].n.front()-1 ].value );
+			double A = alpha[(Element[i].a-1)].value;
+			double B = beta[(Element[i].b-1)].value;
+			double f = force[(Element[i].f-1)].value;
+			if (Element[i].type == "1DC0L,")
+			{
+				outFile << "						  Element Stiffness Matrix " << i+1 <<endl;
+				outFile << "					--------------------------------" << endl;
+				int nb = Element[i].n[0] - 1, ne = Element[i].n[1] - 1;
+			
+				outFile << setw(15) << A / L + B * L / 3 << setw(15) << A / L + B * L / 3 << endl;
+				outFile << setw(15) <<-A / L + B * L / 6 << setw(15) <<-A / L + B * L / 6 << endl;
+				
+				outFile << "						  Element Stiffness Vector " << i+1 <<endl;
+				outFile << "					--------------------------------" << endl;
+				outFile << f * L / 2 << endl << f * L / 2 << endl;
+			}
+			else if (Element[i].type == "1DC0Q,")
+			{
+				outFile << "						  Element Stiffness Matrix " << i+1 << endl;
+				outFile << "					--------------------------------" << endl;
+				int nb = Element[i].n[0] - 1, nm = Element[i].n[1] - 1, ne = Element[i].n[2] - 1;
+				outFile << setw(15) << (7 * A) / (3 * L) + (4* B * L) / 30
+						<< setw(15) << (-8 * A) / (3 * L) + (2 * B * L) / 30
+						<< setw(15) << (A) / (3 * L) - (B * L) / 30 << endl;
+			
+				outFile << setw(15) << (-8 * A) / (3 * L) + (2 * B * L) / 30
+						<< setw(15) << (16 * A) / (3 * L) + (16 * B * L) / 30
+						<< setw(15) << (-8 * A) / (3 * L) + (2 * B * L) / 30 << endl;
+						
+				outFile << setw(15) << (A) / (3 * L) - (B * L) / 30
+						<< setw(15) << (-8 * A) / (3 * L) + (2 * B * L) / 30
+						<< setw(15) << (7 * A) / (3 * L) + (4* B * L) / 30 << endl;
+				outFile << "						  Element Stiffness Vector " << i+1 <<endl;
+				outFile << "					--------------------------------" << endl;
+				outFile << (1 * f * L) / 6 << endl << (4 * f * L) / 6 << endl << (1 * f * L) / 6;
+		}
+	}
+	}
 }
 
 vector<double> Process::Flux(const vector<double> &Sol)
@@ -461,31 +527,6 @@ vector<double> Process::Flux(const vector<double> &Sol)
 		flux[i] = -(Sol[i+1] - Sol[i]) / L * A;
 	}
 	return flux;
-}
-
-bool Process::Symmetric_Cond(vector<vector<double>> A)
-{
-	// check shape sizes
-	int n = A.size(), row, col;
-	for (const auto& row : A)
-	{
-		if (row.size() != n)
-		{
-			return false;
-		}
-	}
-	
-	// checking with transposed
-	for (int i = 0; i < n * n; i++)
-	{
-		row = i / n;
-		col = i % n;
-		if (col > row && A[row][col] != A[col][row])
-		{
-			return false;
-		}
-	}
-	return true;	
 }
 
 void Process::Forward(vector<vector<double>> & Matrix)
@@ -536,15 +577,15 @@ vector<double> Process::Backward(vector<vector<double>> & Matrix)
 	return x;
 }
 
-void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_Cond& LBC, const Boundary_Cond& RBC)
+void Process::ABC(vector<vector<double>>& K, vector<double>& F)
 // Apply Boundary Conditions
 {
 	int n = K.size();
 	// left Boundary Condition
 	if (LBC.type == "EBC")
 	{
-        	for (int i = 0; i < n; i++)
-        	{
+			for (int i = 0; i < n; i++)
+			{
 			F[i] -= K[i][0] * LBC.c;
 		}
 		// Remove row and column for node 1
@@ -561,7 +602,7 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_C
 	{
 		// Mixed BC: Modify K and F
 		K[0][0] -= LBC.c; // c_a
-		F[0] += LBC.d;    // d_a * c
+		F[0] += LBC.d;	// d_a * c
 	}
 	// Right Boundary Condition
 	if (RBC.type == "EBC")
@@ -584,6 +625,6 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_C
 	{
 		// Mixed BC: Modify K and F
 		K[n-1][n-1] += RBC.c; // c_b
-		F[n-1] -= RBC.d;      // d_b * d
+		F[n-1] -= RBC.d;	  // d_b * d
 	}
 }

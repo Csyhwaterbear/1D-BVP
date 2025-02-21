@@ -9,15 +9,16 @@ using namespace std;
 class Process
 {
 	public:
+		void Get_Debug_Level(int num);
 		void Input(const std::string& file_path);		// Get input file path
 		void ParseFile();	// Reads the file once and stores data
 		void PrintData();	// Prints all input values
 		void Print_Matrix(vector<vector<double>> A);	// Print Matrix
 		void Print_Vector(vector<double> A);			// Print Vector
-		bool Symmetric_Cond(vector<vector<double>> A);	// Symmetric matrix check
 		vector<double> Solve(vector<vector<double>> & A, vector<double> & B);
 		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);	// CSR store
 		tuple<vector<vector<double>>, vector<double>> Build();	// KDF build
+		void ABC(vector<vector<double>>& K, vector<double>& F);	// Apply Boundary Conditions
 		vector<double> Solution();
 		void PrintFormattedOutput(ofstream& outFile);
 		vector<double> Flux(const vector<double> &Sol);
@@ -47,6 +48,7 @@ class Process
 			// element type
 		};
 		
+		int Debug_Level;
 		string file_path;	// Input file path
 		
 		vector<Element_Value>	alpha;
@@ -59,7 +61,6 @@ class Process
 
 		static void Forward(vector<vector<double>> & Matrix);
 		static vector<double> Backward(vector<vector<double>> & Matrix);
-		void ABC(vector<vector<double>>& K, vector<double>& F, const Boundary_Cond& LBC, const Boundary_Cond& RBC);	// Apply Boundary Conditions
 };
 
 #endif // PROCESS_H

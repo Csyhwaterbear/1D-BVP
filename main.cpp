@@ -3,6 +3,7 @@
 # include <limits>
 # include <algorithm>
 # include <cctype>
+# include <string>
 # include "Process.h"
 using namespace std;
 
@@ -22,7 +23,8 @@ std::string trim(const std::string& str) {
 
 int main()
 {
-	// input 
+	// input for Debug Level
+	Process test;
 	int Debug_Level;
 	string inputFilePath, outputFilePath;
 	
@@ -31,9 +33,11 @@ int main()
 	cout << "Enter 1: Regular output with System stiffness matrix and the system load vector." << endl;
 	cout << "Enter 2: Regular output Element stiffness matrix, element load vector, system  stiffness matrix and the system load vector." << endl;
 	cin >> Debug_Level;
+	test.Get_Debug_Level(Debug_Level);
 	
 	cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	
+	// Input for input file 
 	cout << "Enter input File name, like Input_Name.txt" << endl;
 	getline(cin, inputFilePath);
 	inputFilePath = "./" + trim(inputFilePath);
@@ -48,41 +52,49 @@ int main()
 		inputFile.open(inputFilePath);
 	}
 	inputFile.close();
-
+	
+	// Input for output file
 	cout << "Enter output File name, like Output_Name.out" << endl;
 	getline(cin, outputFilePath);
 	outputFilePath = "./" + trim(outputFilePath);
 	
-	
-	Process test1;
-	
-	test1.Input( inputFilePath );
-	test1.PrintData();
-
-	vector<vector<double>> K;
-	vector<double> F, D, flux;
-	tie(K, F) = test1.Build();
-	D = test1.Solution();
-	flux = test1.Flux(D);
-
-	// Create output file name
-	size_t lastDot = inputFilePath.find_last_of(".");
-	// string outputFilePath = inputFilePath.substr(0, lastDot) + ".out";
-	
-	// Open the output file
 	ofstream outFile(outputFilePath);
-	if (!outFile.is_open())
-	{
+	if (!outFile.is_open()) {
 		cerr << "Error: Unable to open output file: " << outputFilePath << endl;
 		return 1;
 	}
+	
+	// Computation
+	test.Input( inputFilePath );
+
+	vector<double> D, flux;
+	D = test.Solution();
+	flux = test.Flux(D);
 
 	// Print formatted output to the file
-	test1.PrintFormattedOutput(outFile);
+	test.PrintFormattedOutput(outFile);
 	
 	// Close the file
 	outFile.close();
 	
+	// Print 
+	ifstream inFile(outputFilePath);
+	if (!inFile.is_open()) {
+		cerr << "Error: Unable to open output file for reading: " << outputFilePath << endl;
+		return 1; // Exit the program with an error code
+	}
+
+	cout << "\nContents of the output file:\n";
+	cout << "----------------------------------------\n";
+	string line;
+	while (getline(inFile, line))
+	{
+	cout << line << endl;
+	}
+	cout << "----------------------------------------\n";
+
+	// Close the file
+	inFile.close();
 	cout << "Output written to: " << outputFilePath << endl;
 
 	return 0;
