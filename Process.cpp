@@ -417,9 +417,9 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	outFile << "	 ----------------------------------------------------------------------" << endl;
 	for (const auto& element : Element)
 	{
-		outFile << "	" << element.e << "		  Alpha		  0			  0			  " << alpha[element.a - 1].value << "		  " << endl;
-		outFile << "			   Beta			 0			  0			  " << beta[element.b - 1].value << "		  " << endl;
-		outFile << "			   f					0			  0			  " << force[element.f - 1].value << "		  " << endl;
+		outFile << "	" << element.e << "		  Alpha			0			  0			  " << alpha[element.a - 1].value << endl;
+		outFile << "			   Beta			 0			  0			  " << beta[element.b - 1].value << endl;
+		outFile << "			   f			 0			  0			  " << force[element.f - 1].value << endl;
 	}
 	outFile << endl;
 
