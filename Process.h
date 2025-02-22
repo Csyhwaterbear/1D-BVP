@@ -16,11 +16,11 @@ class Process
 		void Print_Matrix(vector<vector<double>> A);	// Print Matrix
 		void Print_Vector(vector<double> A);			// Print Vector
 		vector<double> Solve(vector<vector<double>> & A, vector<double> & B);
-		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);	// CSR store
+/*		tuple<vector<double>, vector<int>, vector<int>> CSR(vector<vector<double>> A);	// CSR store*/
 		tuple<vector<vector<double>>, vector<double>> Build();	// KDF build
 		void ABC(vector<vector<double>>& K, vector<double>& F);	// Apply Boundary Conditions
 		vector<double> Solution();
-		void PrintFormattedOutput(ofstream& outFile);
+		void PrintFormattedOutput(ofstream& outFile, double absError, double relError);
 		vector<double> Flux(const vector<double> &Sol);
 	private:
 		

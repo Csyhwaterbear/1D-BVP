@@ -4,6 +4,7 @@
 # include <algorithm>
 # include <cctype>
 # include <string>
+# include <cmath>
 # include "Process.h"
 using namespace std;
 
@@ -19,6 +20,22 @@ std::string trim(const std::string& str) {
 		end--;
 	}
 	return std::string(start, end);
+}
+
+double computeL2Norm(const vector<double>& vec) {
+	double norm = 0.0;
+	for (const auto& value : vec)
+	{
+		norm += value * value;
+	}
+	return sqrt(norm);
+}
+
+pair<double, double> computeErrors(const vector<double>& R, const vector<double>& F)
+{
+	double absError = computeL2Norm(R); // Absolute error: ||R||
+	double relError = absError / computeL2Norm(F); // Relative error: ||R|| / ||F||
+	return {absError, relError};
 }
 
 int main()
@@ -66,13 +83,24 @@ int main()
 	
 	// Computation
 	test.Input( inputFilePath );
-
+	auto [K, F] = test.Build();
 	vector<double> D, flux;
 	D = test.Solution();
 	flux = test.Flux(D);
+	
+	vector<double> R(F.size(), 0.0);
+	for (size_t i = 0; i < K.size(); ++i)
+	{
+		for (size_t j = 0; j < K[i].size(); ++j)
+		{
+			R[i] += K[i][j] * D[j];
+		}
+		R[i] -= F[i]; // R = KD - F
+	}
+	auto [absError, relError] = computeErrors(R, F);
 
 	// Print formatted output to the file
-	test.PrintFormattedOutput(outFile);
+	test.PrintFormattedOutput(outFile, absError, relError);
 	
 	// Close the file
 	outFile.close();

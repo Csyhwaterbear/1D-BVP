@@ -317,7 +317,7 @@ vector<double> Process::Solution()
 	return solution;
 }
 
-void Process::PrintFormattedOutput(ofstream& outFile)
+void Process::PrintFormattedOutput(ofstream& outFile, double absError, double relError)
 {
 	outFile << "				   1D Boundary Value Program		 " << endl;
 	outFile << "				 Finite Elements for Engineers	   " << endl;
@@ -446,6 +446,12 @@ void Process::PrintFormattedOutput(ofstream& outFile)
 		outFile << "					" << i + 1 << "			   " << nodal_cord[i].value << "			  " << flux[i] << "		  " << endl;
 	}
 	outFile << endl;
+	
+	outFile << "\nError Measures:\n";
+    outFile << "----------------------------------------\n";
+    outFile << "Absolute Error (||R||): " << absError << "\n";
+    outFile << "Relative Error (||R|| / ||F||): " << relError << "\n";
+    outFile << "----------------------------------------\n";
 	
 	// Debug Level 1: Print System Stiffness Matrix and System Load Vector
 	if (Debug_Level >= 1) {
