@@ -22,6 +22,8 @@ class Process
 		vector<double> Solution();
 		void PrintFormattedOutput(ofstream& outFile, double absError, double relError);
 		vector<double> Flux(const vector<double> &Sol);
+		tuple<double, int, double, int> FindMinMaxNodalValues(const vector<double>& solution);
+		tuple<double, double, double, double> FindMinMaxFluxValues(const vector<double>& flux);
 	private:
 		
 		struct Element_Value

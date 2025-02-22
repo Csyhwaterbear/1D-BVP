@@ -435,6 +435,14 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	}
 	outFile << endl;
 	
+	auto [minNodalVal, minNode, maxNodalVal, maxNode] = FindMinMaxNodalValues(solution);
+	outFile << "					Max and Min Nodal Values" << endl;
+	outFile << "					----------------------------------------" << endl;
+	outFile << "					Min Nodal Value: " << minNodalVal << " at Node " << nodal_cord[minNode-1].value << endl;
+	outFile << "					Max Nodal Value: " << maxNodalVal << " at Node " << nodal_cord[maxNode-1].value << endl;
+	outFile << "					----------------------------------------" << endl;
+	outFile << endl;
+	
 	// Print element flux
 	vector<double> flux = Flux(solution);
 	outFile << "								  Element Flux" << endl;
@@ -445,6 +453,14 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	{
 		outFile << "					" << i + 1 << "			   " << nodal_cord[i].value << "			  " << flux[i] << "		  " << endl;
 	}
+	outFile << endl;
+	
+	auto [minFlux, minFluxLoc, maxFlux, maxFluxLoc] = FindMinMaxFluxValues(flux);
+	outFile << "					Max and Min Flux Values" << endl;
+	outFile << "					----------------------------------------" << endl;
+	outFile << "					Min Flux: " << minFlux << " at Location " << minFluxLoc << endl;
+	outFile << "					Max Flux: " << maxFlux << " at Location " << maxFluxLoc << endl;
+	outFile << "					----------------------------------------" << endl;
 	outFile << endl;
 	
 	outFile << "\nError Measures:\n";
@@ -533,6 +549,46 @@ vector<double> Process::Flux(const vector<double> &Sol)
 		flux[i] = -(Sol[i+1] - Sol[i]) / L * A;
 	}
 	return flux;
+}
+
+tuple<double, int, double, int> Process::FindMinMaxNodalValues(const vector<double>& solution)
+{
+	int minNode = 1, maxNode = 1;
+	double minVal = solution[0], maxVal = solution[0];
+	
+	for (size_t i = 0; i < solution.size(); ++i)
+	{
+		if (solution[i] < minVal)
+		{
+			minVal = solution[i];
+			minNode = i + 1;
+		}
+		if (solution[i] > maxVal)
+		{
+			maxVal = solution[i];
+			maxNode = i + 1; // Node indices start from 1
+		}
+	}
+	return {minVal, minNode, maxVal, maxNode};
+}
+
+tuple<double, double, double, double> Process::FindMinMaxFluxValues(const vector<double>& flux) {
+	double minFlux = flux[0], maxFlux = flux[0], minFluxLocation = nodal_cord[0].value, maxFluxLocation = nodal_cord[0].value;
+
+	for (size_t i = 0; i < flux.size(); ++i)
+	{
+		if (flux[i] < minFlux)
+		{
+			minFlux = flux[i];
+			minFluxLocation = nodal_cord[i].value;
+		}
+		if (flux[i] > maxFlux)
+		{
+			maxFlux = flux[i];
+			maxFluxLocation = nodal_cord[i].value;
+		}
+	}
+	return {minFlux, minFluxLocation, maxFlux, maxFluxLocation};
 }
 
 void Process::Forward(vector<vector<double>> & Matrix)
