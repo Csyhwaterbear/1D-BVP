@@ -1,0 +1,49 @@
+** ------------------------------------
+** CEE526/MAE527: 1DBVP Test Problem #3
+** ------------------------------------
+*feat1D
+*heading
+** any suitable text to track this problem
+Example T4L3-2 modified (units: ft, BTU, F)
+*alpha
+** alpha #, alpha value 
+1, 0.0132093
+2, 0.0132093
+3, 0.0132093
+4, 0.0132093
+*beta
+** beta #, beta value
+1, 0.490874
+2, 0.490874
+3, 0.490874
+4, 0.490874
+*force
+** force #, force value 
+1, 39.2699
+2, 39.2699
+3, 39.2699
+4, 39.2699
+*nodal coordinate
+** node #, x coordinate 
+1, 0.0
+2, 0.0833333
+3, 0.1666667
+4, 0.229167
+5, 0.291667
+6, 0.354167
+7, 0.416667
+*nodal flux
+** node #, flux value
+*element data
+** element #, alpha group, beta group, force group, element type, list of element nodes
+1, 1, 1, 1, 1DC0L, 1, 2
+2, 2, 2, 2, 1DC0L, 2, 3
+3, 3, 3, 3, 1DC0Q, 3, 4, 5
+4, 4, 4, 4, 1DC0Q, 5, 6, 7
+*left end BC
+** bc type, value 1, value 2
+EBC, 150.0, 0.0
+*right end BC
+** bc type, value 1, value 2
+NBC, 0.0, 0.0
+*end

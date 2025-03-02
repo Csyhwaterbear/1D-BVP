@@ -1,0 +1,49 @@
+** ------------------------------------
+** CEE526/MAE527: 1DBVP Test Problem #1
+** ------------------------------------
+*feat1D
+*heading
+** any suitable text to track this problem
+axially loaded bar linear elements (units: lb, in)
+*alpha
+** alpha #, alpha value (A=0.5, E=30e6)
+1, 1.5e7
+*beta
+** beta #, beta value
+1, 0.0
+*force
+** force #, force value (100 lb/in)
+1, 100
+*nodal coordinate
+** node #, x coordinate (100 in long bar)
+1, 0.0
+2, 10.0
+3, 20.0
+4, 30.0
+5, 40.0
+6, 50.0
+7, 60.0
+8, 70.0
+9, 80.0
+10, 90.0
+11, 100.0
+*nodal flux
+** node #, flux value
+6, -1000
+*element data
+** element #, alpha group, beta group, force group, element type, list of element nodes
+1, 1, 1, 1, 1DC0L, 1, 2
+2, 1, 1, 1, 1DC0L, 2, 3
+3, 1, 1, 1, 1DC0L, 3, 4
+4, 1, 1, 1, 1DC0L, 4, 5
+5, 1, 1, 1, 1DC0L, 5, 6
+6, 1, 1, 1, 1DC0L, 6, 7
+7, 1, 1, 1, 1DC0Q, 7, 8, 9
+8, 1, 1, 1, 1DC0Q, 9, 10, 11
+*left end BC
+** bc type, value 1, value 2
+EBC, 0.0, 0.0
+*right end BC
+** bc type, value 1, value 2
+EBC, 0.0, 0.0
+*end

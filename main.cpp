@@ -83,6 +83,7 @@ int main()
 	
 	// Computation
 	test.Input( inputFilePath );
+//	test.PrintData();
 	auto [K, F] = test.Build();
 	vector<double> D, flux;
 	D = test.Solution();

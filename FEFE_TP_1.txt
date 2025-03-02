@@ -1,0 +1,37 @@
+** ------------------------------------
+** CEE526/MAE527: 1DBVP Test Problem #1
+** ------------------------------------
+*feat1D
+*heading
+axially loaded bar with linear elements (units: lb, in)
+*alpha
+** alpha #, AE value (1.5e7 lb-in²)
+1, 1.5e7
+*beta
+** beta #, beta value (not used)
+1, 0.0
+*force
+** force #, distributed load (5 lb/in)
+1, 5
+*nodal coordinate
+** node #, x coordinate (10 in bar)
+1, 0.0
+2, 2.5
+3, 5.0
+4, 7.5
+5, 10.0
+*nodal flux
+** node #, flux value (none specified)
+*element data
+** element #, alpha, beta, force, type, nodes
+1, 1, 1, 1, 1DC0L, 1, 2
+2, 1, 1, 1, 1DC0L, 2, 3
+3, 1, 1, 1, 1DC0L, 3, 4
+4, 1, 1, 1, 1DC0L, 4, 5
+*left end BC
+** fixed displacement at x=0
+EBC, 0.0, 0.0
+*right end BC
+** free end (zero force at x=10)
+NBC, 0.0, 0.0
+*end

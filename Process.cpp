@@ -38,9 +38,10 @@ void Process::ParseFile()
 			}
 			continue;
 		}
-		// cout << currentSection << endl;
+//		cout << currentSection << endl;
 		if (currentSection == "alpha")
 		{
+			cout << "alpha!" << endl;
 			stringstream ss(line);
 			int number;
 			double value;
@@ -290,14 +291,14 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 	{
 		F[ nodal_flux[i].index-1 ] += nodal_flux[i].value;
 	}
-	
+	ABC(K, F);
 	return {K, F};
 }
 
 vector<double> Process::Solution()
 {
 	auto [K, F] = Build();
-	ABC(K, F);
+//	ABC(K, F);
 	vector<double> solution = Solve(K, F);
 	if (!solution.empty())
 	{

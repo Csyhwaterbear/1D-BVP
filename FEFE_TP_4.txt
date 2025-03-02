@@ -1,0 +1,43 @@
+** ------------------------------------
+** CEE526/MAE527: 1DBVP Test Problem #3
+** ------------------------------------
+*feat1D
+*heading
+** any suitable text to track this problem
+Quiz 2 (units: m, kg, N) ill-posed
+*alpha
+** alpha #, alpha value 
+1, 2e10
+*beta
+** beta #, beta value
+1, 0
+*force
+** force #, force value 
+1, -7700.85
+*nodal coordinate
+** node #, x coordinate 
+1, 0.0
+2, 0.125
+3, 0.25
+4, 0.375
+5, 0.5
+6, 0.625
+7, 0.75
+8, 0.875
+9, 1.0
+*nodal flux
+** node #, flux value
+3, 1000
+*element data
+** element #, alpha group, beta group, force group, element type, list of element nodes
+1, 1, 1, 1, 1DC0Q, 1, 2, 3
+2, 1, 1, 1, 1DC0Q, 3, 4, 5
+3, 1, 1, 1, 1DC0Q, 5, 6, 7
+4, 1, 1, 1, 1DC0Q, 7, 8, 9
+*left end BC
+** bc type, value 1, value 2
+NBC, 0.0, 0.0
+*right end BC
+** bc type, value 1, value 2
+NBC, 0.0, 0.0
+*end
