@@ -39,7 +39,7 @@ void Process::ParseFile()
 			continue;
 		}
 //		cout << currentSection << endl;
-		if (currentSection == "alpha")
+		if (currentSection == "alpha" || currentSection == "alpha\r")
 		{
 			cout << "alpha!" << endl;
 			stringstream ss(line);
@@ -49,7 +49,7 @@ void Process::ParseFile()
 			ss >> number >> comma >> value;
 			alpha.push_back({number,value});
 		}
-		if (currentSection == "beta")
+		if (currentSection == "beta" || currentSection == "beta\r")
 		{
 			stringstream ss(line);
 			int number;
@@ -58,7 +58,7 @@ void Process::ParseFile()
 			ss >> number >> comma >> value;
 			beta.push_back({number,value});
 		}
-		if (currentSection == "force")
+		if (currentSection == "force" || currentSection == "force\r")
 		{
 			stringstream ss(line);
 			int number;
@@ -67,7 +67,7 @@ void Process::ParseFile()
 			ss >> number >> comma >> value;
 			force.push_back({number,value});
 		}
-		if (currentSection == "nodal coordinate")
+		if (currentSection == "nodal coordinate" || currentSection == "nodal coordinate\r")
 		{
 			stringstream ss(line);
 			int number;
@@ -76,7 +76,7 @@ void Process::ParseFile()
 			ss >> number >> comma >> value;
 			nodal_cord.push_back({number,value});
 		}
-		if (currentSection == "nodal flux")
+		if (currentSection == "nodal flux" || currentSection == "nodal flux\r")
 		{
 			stringstream ss(line);
 			int number;
@@ -85,7 +85,7 @@ void Process::ParseFile()
 			ss >> number >> comma >> value;
 			nodal_flux.push_back({number,value});
 		}
-		if (currentSection == "element data")
+		if (currentSection == "element data" || currentSection == "element data\r")
 		{
 			stringstream ss(line);
 			Element_Data data;
@@ -105,7 +105,7 @@ void Process::ParseFile()
 			}
 			Element.push_back(data);
 		}
-		if (currentSection == "left end BC")
+		if (currentSection == "left end BC" || currentSection == "left end BC\r")
 		{
 			stringstream ss(line);
 			Boundary_Cond data;
@@ -114,7 +114,7 @@ void Process::ParseFile()
 			ss >> data.c >> comma >> data.d;
 			LBC = data;
 		}
-		if (currentSection == "right end BC")
+		if (currentSection == "right end BC" || currentSection == "right end BC\r")
 		{
 			stringstream ss(line);
 			Boundary_Cond data;
