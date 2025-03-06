@@ -6,6 +6,14 @@
 
 using namespace std;
 
+struct FluxResult
+		{
+			int elementIndex;
+			int intervalIndex;
+			double value;
+			double location;
+		};
+
 class Process
 {
 	public:
@@ -21,9 +29,8 @@ class Process
 		void ABC(vector<vector<double>>& K, vector<double>& F);	// Apply Boundary Conditions
 		vector<double> Solution();
 		void PrintFormattedOutput(ofstream& outFile, double absError, double relError);
-		vector<double> Flux(const vector<double> &Sol);
-		tuple<double, int, double, int> FindMinMaxNodalValues(const vector<double>& solution);
-		tuple<double, double, double, double> FindMinMaxFluxValues(const vector<double>& flux);
+		vector<FluxResult> Flux(const vector<double> &Sol);
+		tuple<double, double, double, double> FindMinMaxFluxValues(const vector<FluxResult>& flux);
 	private:
 		
 		struct Element_Value
@@ -49,6 +56,8 @@ class Process
 			string type;
 			// element type
 		};
+		
+		
 		
 		int Debug_Level;
 		string file_path;	// Input file path

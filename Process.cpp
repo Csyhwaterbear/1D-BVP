@@ -436,7 +436,8 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	}
 	outFile << endl;
 	
-	auto [minNodalVal, minNode, maxNodalVal, maxNode] = FindMinMaxNodalValues(solution);
+	vector<FluxResult> fluxResults = Flux(solution);
+	auto [minNodalVal, minNode, maxNodalVal, maxNode] = FindMinMaxFluxValues(fluxResults);
 	outFile << "					Max and Min Nodal Values" << endl;
 	outFile << "					----------------------------------------" << endl;
 	outFile << "					Min Nodal Value: " << minNodalVal << " at Node " << nodal_cord[minNode-1].value << endl;
@@ -445,24 +446,24 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	outFile << endl;
 	
 	// Print element flux
-	vector<double> flux = Flux(solution);
 	outFile << "								  Element Flux" << endl;
 	outFile << "					----------------------------------------" << endl;
 	outFile << "					Element   Location	   Flux		   " << endl;
 	outFile << "					----------------------------------------" << endl;
-	for (size_t i = 0; i < flux.size(); ++i)
+	for (const auto& fr : fluxResults)
 	{
-		outFile << "					" << i + 1 << "			   " << (nodal_cord[i].value+nodal_cord[i+1].value)/2 << "			  " << flux[i] << "		  " << endl;
+		outFile << "					" << fr.elementIndex + 1 << "-" << fr.intervalIndex + 1 
+            << "		   " << fr.location 
+            << "			  " << fr.value << "		  " << endl;
 	}
 	outFile << endl;
-	
-	auto [minFlux, minFluxLoc, maxFlux, maxFluxLoc] = FindMinMaxFluxValues(flux);
+
+	auto [minFlux, minFluxLoc, maxFlux, maxFluxLoc] = FindMinMaxFluxValues(fluxResults);
 	outFile << "					Max and Min Flux Values" << endl;
 	outFile << "					----------------------------------------" << endl;
 	outFile << "					Min Flux: " << minFlux << " at Location " << minFluxLoc << endl;
 	outFile << "					Max Flux: " << maxFlux << " at Location " << maxFluxLoc << endl;
 	outFile << "					----------------------------------------" << endl;
-	outFile << endl;
 	
 	outFile << "\nError Measures:\n";
     outFile << "----------------------------------------\n";
@@ -539,54 +540,101 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	}
 }
 
-vector<double> Process::Flux(const vector<double> &Sol)
+vector<FluxResult> Process::Flux(const vector<double> &Sol)
 {
-	int n = Sol.size();
-	vector<double> flux(Element.size(), 0.0);
+	vector<FluxResult> fluxResults;
 	for (int i = 0; i < Element.size(); i++)
 	{
-		double L = abs( nodal_cord[ Element[i].n.back()-1 ].value - nodal_cord[ Element[i].n.front()-1 ].value );
-		double A = alpha[(Element[i].a-1)].value;
-		flux[i] = -(Sol[i+1] - Sol[i]) / L * A;
+		const auto& element = Element[i];
+		double A = alpha[element.a-1].value;
+		
+		if (element.type == "1DC0L,")
+		{
+			// Linear element
+			int n1 = element.n[0] - 1;
+			int n2 = element.n[1] - 1;
+			double x1 = nodal_cord[n1].value;
+			double x2 = nodal_cord[n2].value;
+			double L = x2 - x1;
+			double midpoint = (x1 + x2) / 2.0;
+			double flux_val = -A * (Sol[n2] - Sol[n1]) / L;
+			
+			FluxResult fr;
+			fr.elementIndex = i;
+			fr.intervalIndex = 0;
+			fr.value = flux_val;
+			fr.location = midpoint;
+			fluxResults.push_back(fr);
+ 		}
+		else if (element.type == "1DC0Q,")
+		{
+			// Quadratic element using correct equation
+			int n1 = element.n[0] - 1;
+			int n2 = element.n[1] - 1;
+			int n3 = element.n[2] - 1;
+			double x1 = nodal_cord[n1].value;
+			double x2 = nodal_cord[n2].value;
+			double x3 = nodal_cord[n3].value;
+			double L = x3 - x1;
+            
+			// Compute flux using exact equation
+			double midpoint1 = x1 + L * 0.0528312 *4;
+			double midpoint2 = x3 - L * 0.0528312 *4;
+			double flux1, flux2;
+            		if( (Sol[n2] - Sol[n1]) / Sol[n2] < 1e-10 && (Sol[n3] - Sol[n2]) / Sol[n3] < 1e-10 && (Sol[n1] - Sol[n3]) / Sol[n1] < 1e-10 )
+			{
+				flux1 = 0.0;
+				flux2 = 0.0;
+			}
+			else
+			{
+				flux1 = -A / (L * L) * (
+					midpoint1 * (4 * Sol[n1] - 8 * Sol[n2] + 4 * Sol[n3]) +
+					x1 * (4 * Sol[n2] - 2 * Sol[n3]) -
+					2 * x2 * (Sol[n1] + Sol[n3]) -
+					2 * x3 * (Sol[n1] - 2 * Sol[n2])
+				);
+            			
+				flux2 = -A / (L * L) * (
+					midpoint2 * (4 * Sol[n1] - 8 * Sol[n2] + 4 * Sol[n3]) +
+					x1 * (4 * Sol[n2] - 2 * Sol[n3]) -
+					2 * x2 * (Sol[n1] + Sol[n3]) -
+					2 * x3 * (Sol[n1] - 2 * Sol[n2])
+				);
+			}
+            
+			FluxResult fr1 = {i, 0, flux1, midpoint1};
+			FluxResult fr2 = {i, 1, flux2, midpoint2};
+			fluxResults.push_back(fr1);
+            		fluxResults.push_back(fr2);
+		}
 	}
-	return flux;
+	return fluxResults;
 }
 
-tuple<double, int, double, int> Process::FindMinMaxNodalValues(const vector<double>& solution)
+tuple<double, double, double, double> Process::FindMinMaxFluxValues(const vector<FluxResult>& flux)
 {
-	int minNode = 1, maxNode = 1;
-	double minVal = solution[0], maxVal = solution[0];
-	
-	for (size_t i = 0; i < solution.size(); ++i)
+	if (flux.empty())
 	{
-		if (solution[i] < minVal)
-		{
-			minVal = solution[i];
-			minNode = i + 1;
-		}
-		if (solution[i] > maxVal)
-		{
-			maxVal = solution[i];
-			maxNode = i + 1; // Node indices start from 1
-		}
+		return {0.0, 0.0, 0.0, 0.0};
 	}
-	return {minVal, minNode, maxVal, maxNode};
-}
 
-tuple<double, double, double, double> Process::FindMinMaxFluxValues(const vector<double>& flux) {
-	double minFlux = flux[0], maxFlux = flux[0], minFluxLocation = nodal_cord[0].value, maxFluxLocation = nodal_cord[0].value;
-
-	for (size_t i = 0; i < flux.size(); ++i)
+	double minFlux = flux[0].value;
+	double maxFlux = flux[0].value;
+	double minFluxLocation = flux[0].location;
+	double maxFluxLocation = flux[0].location;
+	
+	for (const auto& fr : flux)
 	{
-		if (flux[i] < minFlux)
+		if (fr.value < minFlux)
 		{
-			minFlux = (flux[i]+flux[i+1])/2;
-			minFluxLocation = nodal_cord[i].value;
+			minFlux = fr.value;
+			minFluxLocation = fr.location;
 		}
-		if (flux[i] > maxFlux)
+		if (fr.value > maxFlux)
 		{
-			maxFlux = (flux[i]+flux[i+1])/2;
-			maxFluxLocation = nodal_cord[i].value;
+			maxFlux = fr.value;
+			maxFluxLocation = fr.location;
 		}
 	}
 	return {minFlux, minFluxLocation, maxFlux, maxFluxLocation};

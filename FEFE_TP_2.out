@@ -63,24 +63,23 @@
 
 					Max and Min Nodal Values
 					----------------------------------------
-					Min Nodal Value: 20 at Node 0.6
-					Max Nodal Value: 304.762 at Node 0
+					Min Nodal Value: 12381 at Node 0
+					Max Nodal Value: 12381 at Node 0
 					----------------------------------------
 
 								  Element Flux
 					----------------------------------------
 					Element   Location	   Flux		   
 					----------------------------------------
-					1			   0.15			  12381		  
-					2			   0.375			  12381		  
-					3			   0.525			  12381		  
+					1-1		   0.15			  12381		  
+					2-1		   0.375			  12381		  
+					3-1		   0.525			  12381		  
 
 					Max and Min Flux Values
 					----------------------------------------
-					Min Flux: 12381 at Location 0
-					Max Flux: 6190.48 at Location 0.45
+					Min Flux: 12381 at Location 0.15
+					Max Flux: 12381 at Location 0.525
 					----------------------------------------
-
 
 Error Measures:
 ----------------------------------------
