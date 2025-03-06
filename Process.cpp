@@ -452,7 +452,7 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	outFile << "					----------------------------------------" << endl;
 	for (size_t i = 0; i < flux.size(); ++i)
 	{
-		outFile << "					" << i + 1 << "			   " << nodal_cord[i].value << "			  " << flux[i] << "		  " << endl;
+		outFile << "					" << i + 1 << "			   " << (nodal_cord[i].value+nodal_cord[i+1].value)/2 << "			  " << flux[i] << "		  " << endl;
 	}
 	outFile << endl;
 	
@@ -580,12 +580,12 @@ tuple<double, double, double, double> Process::FindMinMaxFluxValues(const vector
 	{
 		if (flux[i] < minFlux)
 		{
-			minFlux = flux[i];
+			minFlux = (flux[i]+flux[i+1])/2;
 			minFluxLocation = nodal_cord[i].value;
 		}
 		if (flux[i] > maxFlux)
 		{
-			maxFlux = flux[i];
+			maxFlux = (flux[i]+flux[i+1])/2;
 			maxFluxLocation = nodal_cord[i].value;
 		}
 	}

@@ -1,0 +1,139 @@
+		---------------------------------------------
+		           1D Boundary Value Program         
+		         Finite Elements for Engineers       
+		          (c) 1998-2022, S. D. Rajan         
+		              Version: 3.4. Rev: 3
+		---------------------------------------------
+
+		Date: 03/05/25. Time: 04:58 PM
+
+
+
+          DETAILS OF FINITE ELEMENT MODEL
+          -------------------------------
+               Number of Nodes: 11
+            Number of Elements: 8
+
+                                  Nodal Data
+                           -------------------------
+                           Node      X Coor         
+                           -------------------------
+                           1         0              
+                           2         10             
+                           3         20             
+                           4         30             
+                           5         40             
+                           6         50             
+                           7         60             
+                           8         70             
+                           9         80             
+                           10        90             
+                           11        100            
+                           
+
+                           Nodal Boundary Conditions
+               --------------------------------------------------
+               Node      BC        Value 1        Value 2        
+               --------------------------------------------------
+               1         EBC       0                             
+               11        EBC       0                             
+               
+
+                        User Applied Concentrated Flux
+            -------------------------------------------------------
+            Location  Applied Flux   Nearest Node   Dist. Error    
+            -------------------------------------------------------
+            50        -1000          6              0              
+            
+
+                              Applied Nodal Flux
+                           -------------------------
+                           Node      Flux           
+                           -------------------------
+                           6         -1000          
+                           
+
+                                 Element Data
+       -----------------------------------------------------------------
+       Element   Type           Int. Order     List of Nodes ...                    
+       -----------------------------------------------------------------
+       1         C0-Linear      2              1    2                   
+       2         C0-Linear      2              2    3                   
+       3         C0-Linear      2              3    4                   
+       4         C0-Linear      2              4    5                   
+       5         C0-Linear      2              5    6                   
+       6         C0-Linear      2              6    7                   
+       7         C0-Quadratic   4              7    8    9              
+       8         C0-Quadratic   4              9    10   11             
+       
+
+                               Element Properties
+     ----------------------------------------------------------------------
+     Element   Qty            x**2           x              constant       
+     ----------------------------------------------------------------------
+     1         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     2         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     3         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     4         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     5         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     6         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     7         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     8         Alpha          0              0              1.5e+07        
+               Beta           0              0              0              
+               f              0              0              100            
+     
+
+                                  Nodal Values
+                    ----------------------------------------
+                    Node      Location       Value          
+                    ----------------------------------------
+                    1         0              0              
+                    2         10             0.00266667     
+                    3         20             0.00466667     
+                    4         30             0.006          
+                    5         40             0.00666667     
+                    6         50             0.00666667     
+                    7         60             0.00666667     
+                    8         70             0.006          
+                    9         80             0.00466667     
+                    10        90             0.00266667     
+                    11        100            0              
+                    
+                    Min. Nodal Value = 0
+                 Min. Nodal Location = 0
+                    Max. Nodal Value = 0.00666667
+                 Max. Nodal Location = 40
+
+                                  Element Flux
+                    ----------------------------------------
+                    Element   Location       Flux           
+                    ----------------------------------------
+                    1         5              -4000          
+                    2         15             -3000          
+                    3         25             -2000          
+                    4         35             -1000          
+                    5         45             -0             
+                    6         55             -0             
+                    7         64.2265        922.65         
+                              75.7735        2077.35        
+                    8         84.2265        2922.65        
+                              95.7735        4077.35        
+                    
+                    Min. Element Flux = -4000
+                   Min. Flux Location = 5
+                    Max. Element Flux = 4077.35
+                   Max. Flux Location = 95.7735
