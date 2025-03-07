@@ -668,6 +668,7 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F)
 		F[0] += LBC.d;	// d_a * c
 	}
 	// Right Boundary Condition
+	n = K.size();
 	if (RBC.type == "EBC")
 	{
 	 	for (int i = 0; i < n-1; i++)
