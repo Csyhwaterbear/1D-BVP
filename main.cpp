@@ -85,8 +85,9 @@ int main()
 	test.Input( inputFilePath );
 //	test.PrintData();
 	auto [K, F] = test.Build();
-	vector<double> D, flux;
+	vector<double> D;
 	D = test.Solution();
+	vector<FluxResult> flux;
 	flux = test.Flux(D);
 	
 	vector<double> R(F.size(), 0.0);
