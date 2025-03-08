@@ -42,17 +42,17 @@ int main()
 {
 	// input for Debug Level
 	Process test;
-	int Debug_Level;
+	int Debug_Level = 0;
 	string inputFilePath, outputFilePath;
 	
-	cout << "Enter debug level" << endl;
-	cout << "Enter 0: Regular output" << endl;
-	cout << "Enter 1: Regular output with System stiffness matrix and the system load vector." << endl;
-	cout << "Enter 2: Regular output Element stiffness matrix, element load vector, system  stiffness matrix and the system load vector." << endl;
-	cin >> Debug_Level;
+	// cout << "Enter debug level" << endl;
+	// cout << "Enter 0: Regular output" << endl;
+	// cout << "Enter 1: Regular output with System stiffness matrix and the system load vector." << endl;
+	// cout << "Enter 2: Regular output Element stiffness matrix, element load vector, system  stiffness matrix and the system load vector." << endl;
+	// cin >> Debug_Level;
 	test.Get_Debug_Level(Debug_Level);
 	
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	//cin.ignore(numeric_limits<streamsize>::max(), '\n');
 	
 	// Input for input file 
 	cout << "Enter input File name, like Input_Name.txt" << endl;

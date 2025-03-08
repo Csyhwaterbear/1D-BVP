@@ -197,14 +197,14 @@ void Process::Print_Vector(vector<double> A) {
 
 vector<double> Process::Solve(vector<vector<double>> & A, vector<double> & B)
 {
-	int n = A.size();
+	size_t n = A.size();
 	if ( n == 0 || A[0].size() != n || B.size() != n )
 	{
 		cerr << "Error: Invalid input dimensions!" << endl;
 		return {};
 	}
 	vector<vector<double>> Matrix = A;
-	for (int i = 0; i < n; i++)
+	for (size_t i = 0; i < n; i++)
 	{
 		Matrix[i].push_back(B[i]);
 	}
@@ -248,7 +248,7 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 	int n = nodal_cord.size();
 	vector<vector<double>> K(n, vector<double>(n));
 	vector<double> D(n), F(n);
-	for ( int i = 0; i < Element.size(); i++ )
+	for ( size_t i = 0; i < Element.size(); i++ )
 	{
 		double L = abs( nodal_cord[ Element[i].n.back()-1 ].value - nodal_cord[ Element[i].n.front()-1 ].value );
 		double A = alpha[(Element[i].a-1)].value;
@@ -287,7 +287,7 @@ tuple<vector<vector<double>>, vector<double>> Process::Build()
 			F[ne] += (1 * f * L) / 6;
 		}
 	}
-	for ( int i = 0; i < nodal_flux.size(); i++ )
+	for ( size_t i = 0; i < nodal_flux.size(); i++ )
 	{
 		F[ nodal_flux[i].index-1 ] += nodal_flux[i].value;
 	}
@@ -497,7 +497,7 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 	}
 	if (Debug_Level == 2)
 	{
-		for ( int i = 0; i < Element.size(); i++ )
+		for ( size_t i = 0; i < Element.size(); i++ )
 		{
 			double L = abs( nodal_cord[ Element[i].n.back()-1 ].value - nodal_cord[ Element[i].n.front()-1 ].value );
 			double A = alpha[(Element[i].a-1)].value;
@@ -507,7 +507,6 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 			{
 				outFile << "						  Element Stiffness Matrix " << i+1 <<endl;
 				outFile << "					--------------------------------" << endl;
-				int nb = Element[i].n[0] - 1, ne = Element[i].n[1] - 1;
 			
 				outFile << setw(15) << A / L + B * L / 3 << setw(15) << A / L + B * L / 3 << endl;
 				outFile << setw(15) <<-A / L + B * L / 6 << setw(15) <<-A / L + B * L / 6 << endl;
@@ -520,7 +519,6 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 			{
 				outFile << "						  Element Stiffness Matrix " << i+1 << endl;
 				outFile << "					--------------------------------" << endl;
-				int nb = Element[i].n[0] - 1, nm = Element[i].n[1] - 1, ne = Element[i].n[2] - 1;
 				outFile << setw(15) << (7 * A) / (3 * L) + (4* B * L) / 30
 						<< setw(15) << (-8 * A) / (3 * L) + (2 * B * L) / 30
 						<< setw(15) << (A) / (3 * L) - (B * L) / 30 << endl;
@@ -543,7 +541,7 @@ void Process::PrintFormattedOutput(ofstream& outFile, double absError, double re
 vector<FluxResult> Process::Flux(const vector<double> &Sol)
 {
 	vector<FluxResult> fluxResults;
-	for (int i = 0; i < Element.size(); i++)
+	for (size_t i = 0; i < Element.size(); i++)
 	{
 		const auto& element = Element[i];
 		double A = alpha[element.a-1].value;
@@ -716,6 +714,7 @@ void Process::ABC(vector<vector<double>>& K, vector<double>& F)
 		F[0] += LBC.d;	// d_a * c
 	}
 	// Right Boundary Condition
+	n = K.size();
 	if (RBC.type == "EBC")
 	{
 	 	for (int i = 0; i < n-1; i++)

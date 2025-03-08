@@ -8,8 +8,8 @@ using namespace std;
 
 struct FluxResult
 		{
-			int elementIndex;
-			int intervalIndex;
+			size_t elementIndex;
+			size_t intervalIndex;
 			double value;
 			double location;
 		};
