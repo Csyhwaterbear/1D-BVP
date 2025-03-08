@@ -604,7 +604,7 @@ vector<FluxResult> Process::Flux(const vector<double> &Sol)
 			FluxResult fr1 = {i, 0, flux1, midpoint1};
 			FluxResult fr2 = {i, 1, flux2, midpoint2};
 			fluxResults.push_back(fr1);
-            		fluxResults.push_back(fr2);
+            fluxResults.push_back(fr2);
 		}
 	}
 	return fluxResults;
